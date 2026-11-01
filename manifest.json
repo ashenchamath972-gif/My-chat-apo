@@ -1,0 +1,9 @@
+{
+  "name": "My Chat",
+  "short_name": "My Chat",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7faf8",
+  "theme_color": "#087e4b",
+  "description": "A green and white chat app prototype"
+}

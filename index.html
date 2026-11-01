@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#087e4b">
+  <meta name="description" content="My Chat - a friendly chat app prototype">
+  <link rel="manifest" href="manifest.json">
+  <title>My Chat</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#15251d;background:#eef2ef}
+    *{box-sizing:border-box}
+    body{margin:0;background:#eef2ef}
+    .app{max-width:680px;margin:auto;min-height:100dvh;background:#f7faf8;display:flex;flex-direction:column}
+    header{background:#087e4b;color:white;padding:17px 16px 0;position:sticky;top:0;z-index:2;box-shadow:0 2px 8px #0001}
+    .top{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px}
+    .brand{font-size:24px;font-weight:750;letter-spacing:.2px}
+    .sub{font-size:12px;color:#d6f2e3;margin-top:2px}
+    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+    .tab{border:0;background:transparent;color:#d6f2e3;padding:12px 2px 10px;font-size:13px;font-weight:650;border-bottom:3px solid transparent}
+    .tab.active{color:white;border-bottom-color:white}
+    main{padding:14px 12px 88px;flex:1}
+    .search{width:100%;border:0;border-radius:13px;padding:13px 14px;background:white;font-size:15px;outline:1px solid #e1e9e4;margin-bottom:12px}
+    .card{background:white;border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px #163b2710}
+    .chat{display:flex;align-items:center;gap:12px;cursor:pointer}
+    .avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#d9f1e4;color:#087e4b;font-size:19px;font-weight:750;flex:none}
+    .chatbody{min-width:0;flex:1}
+    .chatname{font-weight:700}
+    .preview{font-size:13px;color:#738078;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+    .time{font-size:11px;color:#738078}
+    .pill{background:#087e4b;color:white;border-radius:20px;padding:2px 7px;font-size:11px;margin-top:5px;display:inline-block}
+    .section-title{font-weight:750;margin:5px 2px 12px}
+    .muted{color:#78847d;font-size:13px}
+    .row{display:flex;align-items:center;gap:12px}
+    .space{justify-content:space-between}
+    button{font:inherit;cursor:pointer}
+    .primary{border:0;border-radius:12px;background:#087e4b;color:white;padding:12px 15px;font-weight:700}
+    .secondary{border:1px solid #dce7df;border-radius:12px;background:white;color:#087e4b;padding:10px 13px;font-weight:650}
+    .fab{position:fixed;right:max(18px,calc((100vw - 680px)/2 + 18px));bottom:20px;width:56px;height:56px;border:0;border-radius:50%;background:#087e4b;color:white;font-size:25px;box-shadow:0 5px 16px #064c2e55}
+    .bottom-note{font-size:11px;color:#8a958e;text-align:center;margin:18px 4px}
+    .chatview{display:none;position:fixed;inset:0;z-index:5;background:#edf3ef;max-width:680px;margin:auto;flex-direction:column}
+    .chathead{background:#087e4b;color:white;padding:13px;display:flex;align-items:center;gap:12px}
+    .chathead button{border:0;background:transparent;color:white;font-size:22px}
+    .messages{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:9px}
+    .bubble{max-width:82%;background:white;border-radius:14px 14px 14px 4px;padding:10px 12px;box-shadow:0 1px 2px #0001;font-size:14px}
+    .bubble.mine{align-self:flex-end;background:#d8f6df;border-radius:14px 14px 4px 14px}
+    .composer{display:flex;gap:8px;padding:10px;background:#f8fbf9;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+    .composer input{min-width:0;flex:1;border:0;border-radius:24px;padding:12px 15px;font-size:15px;outline:1px solid #e1e9e4}
+    .profile-input{width:100%;padding:12px;border:1px solid #dce7df;border-radius:11px;font:inherit;margin:6px 0 12px;background:white}
+    .setting{padding:12px 0;border-bottom:1px solid #edf1ee}
+    .setting:last-child{border:0}
+    .status-ring{border:2px solid #0b9c5d;padding:3px;border-radius:50%}
+    .hidden{display:none!important}
+    @media(min-width:681px){body{padding:0}.app{box-shadow:0 0 24px #0001}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="top"><div><div class="brand">My Chat</div><div class="sub">Stay connected 💚</div></div><div aria-label="More">⋮</div></div>
+    <nav class="tabs" aria-label="Main navigation">
+      <button class="tab active" data-tab="chats">Chats</button>
+      <button class="tab" data-tab="status">Status</button>
+      <button class="tab" data-tab="calls">Calls</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+  </header>
+  <main id="main"></main>
+  <button class="fab" id="newChat" aria-label="New chat">＋</button>
+</div>
+
+<section class="chatview" id="chatView">
+  <div class="chathead">
+    <button id="back" aria-label="Back">‹</button>
+    <div class="avatar" id="chatAvatar">K</div>
+    <div style="flex:1"><div id="chatTitle" style="font-weight:700">Contact</div><div class="sub">Demo conversation</div></div>
+    <span>☎</span><span>▣</span>
+  </div>
+  <div class="messages" id="messages"></div>
+  <form class="composer" id="sendForm">
+    <input id="messageInput" placeholder="Message..." autocomplete="off" aria-label="Message">
+    <button class="primary" type="submit">➤</button>
+  </form>
+</section>
+<script>
+const seed = [
+  {name:"Kasun",msg:"හෙට හමුවෙමු 😊",time:"10:42",unread:2,avatar:"K"},
+  {name:"Nimali",msg:"Photo එක එවන්නකෝ",time:"09:18",unread:1,avatar:"N"},
+  {name:"My Friends Group",msg:"ඔයාලා කොහෙද?",time:"Yesterday",unread:0,avatar:"G"},
+  {name:"Amma",msg:"ගෙදර එනකොට කියන්න",time:"Yesterday",unread:0,avatar:"A"}
+];
+let chats = JSON.parse(localStorage.getItem("mychat-chats") || "null") || seed;
+let active = null;
+let tab = "chats";
+let conversation = {};
+const $ = s => document.querySelector(s);
+function save(){localStorage.setItem("mychat-chats",JSON.stringify(chats));}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function render(){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+  $("#newChat").classList.toggle("hidden",tab!=="chats");
+  const main=$("#main");
+  if(tab==="chats"){
+    main.innerHTML=`<input class="search" id="search" placeholder="Search chats..." aria-label="Search chats">
+      <div id="chatList"></div><div class="bottom-note">My Chat prototype • messages stay on this device</div>`;
+    const draw=()=>{
+      const q=$("#search").value.toLowerCase();
+      $("#chatList").innerHTML=chats.filter(c=>c.name.toLowerCase().includes(q)).map(c=>`
+        <div class="card chat" data-name="${safe(c.name)}"><div class="avatar">${safe(c.avatar||c.name[0])}</div>
+        <div class="chatbody"><div class="chatname">${safe(c.name)}</div><div class="preview">${safe(c.msg||"Start a conversation")}</div></div>
+        <div style="text-align:right"><div class="time">${safe(c.time||"")}</div>${c.unread?`<span class="pill">${c.unread}</span>`:""}</div></div>`).join("");
+      document.querySelectorAll("[data-name]").forEach(el=>el.onclick=()=>openChat(el.dataset.name));
+    };
+    $("#search").oninput=draw;draw();
+  } else if(tab==="status"){
+    main.innerHTML=`<div class="card"><div class="section-title">My Status</div><div class="row"><div class="status-ring"><div class="avatar">＋</div></div><div><b>Add Status</b><div class="muted">Share a text update (demo)</div></div></div><button class="primary" id="addStatus" style="margin-top:15px">Add text status</button></div><div class="card"><b>Recent updates</b><p class="muted">No recent updates yet.</p></div>`;
+    $("#addStatus").onclick=()=>{const s=prompt("Write a short status");if(s)alert("Demo status saved on this device: "+s);};
+  } else if(tab==="calls"){
+    main.innerHTML=`<div class="card"><div class="section-title">Calls</div><div class="row"><div class="avatar">☎</div><div><b>Voice & Video Calls</b><div class="muted">Call interface preview only</div></div></div><p class="muted">Real calls need a secure calling service and backend.</p><button class="secondary" onclick="alert('Calling is not connected in this prototype.')">Try demo call</button></div>`;
+  } else {
+    const name=localStorage.getItem("mychat-name")||"My Chat User";
+    const about=localStorage.getItem("mychat-about")||"Hey there! I am using My Chat.";
+    main.innerHTML=`<div class="card"><div class="row"><div class="avatar">U</div><div><b>${safe(name)}</b><div class="muted">${safe(about)}</div></div></div></div>
+      <div class="card"><div class="section-title">Profile</div><label class="muted">Display name</label><input class="profile-input" id="profileName" value="${safe(name)}"><label class="muted">About</label><input class="profile-input" id="profileAbout" value="${safe(about)}"><button class="primary" id="saveProfile">Save profile</button></div>
+      <div class="card"><div class="section-title">Settings</div>
+        <div class="setting row space"><span>Notifications (demo)</span><input type="checkbox" checked></div>
+        <div class="setting row space"><span>Dark mode</span><input type="checkbox" id="darkMode"></div>
+        <div class="setting"><b>Privacy & Security</b><div class="muted">Privacy controls will be added with account services.</div></div>
+        <div class="setting"><b>About My Chat</b><div class="muted">Prototype version 0.1</div></div>
+      </div>`;
+    $("#saveProfile").onclick=()=>{localStorage.setItem("mychat-name",$("#profileName").value);localStorage.setItem("mychat-about",$("#profileAbout").value);render();alert("Profile saved on this device.");};
+    $("#darkMode").onchange=e=>{document.body.style.filter=e.target.checked?"invert(.88) hue-rotate(160deg)":"none";};
+  }
+}
+function openChat(name){
+  active=name;const c=chats.find(x=>x.name===name);$("#chatTitle").textContent=name;$("#chatAvatar").textContent=c?.avatar||name[0];
+  $("#chatView").style.display="flex";conversation[name]=conversation[name]||["ආයුබෝවන්! 👋"];
+  drawMessages();
+}
+function drawMessages(){
+  $("#messages").innerHTML=conversation[active].map((m,i)=>`<div class="bubble ${i===0?"":"mine"}">${safe(m)}</div>`).join("");
+  $("#messages").scrollTop=$("#messages").scrollHeight;
+}
+$("#back").onclick=()=>{$("#chatView").style.display="none";};
+$("#sendForm").onsubmit=e=>{
+  e.preventDefault();const v=$("#messageInput").value.trim();if(!v)return;
+  conversation[active].push(v);const c=chats.find(x=>x.name===active);if(c){c.msg=v;c.time="Now";}save();$("#messageInput").value="";drawMessages();
+};
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();});
+$("#newChat").onclick=()=>{const n=prompt("Contact or group name");if(!n)return;if(!chats.some(c=>c.name===n))chats.unshift({name:n,msg:"New conversation",time:"Now",unread:0,avatar:n[0].toUpperCase()});save();openChat(n);};
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
